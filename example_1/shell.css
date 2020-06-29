@@ -1,0 +1,60 @@
+body {
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+}
+button {
+    min-width: 120px;
+}
+
+.em_button {
+    height: 40px;
+    background-color: orangered;
+    color: white;
+    border: 0px;
+    font-size: 20px;
+    border-radius: 8px;
+    transition-duration: 0.2s;
+
+}
+
+.em_button:hover {
+    background-color: orange;
+}
+
+.em_input {
+    height: 20px;
+    font-size: 20px;
+    background-color: darkslategray;
+    color: white;
+    padding: 6px;
+}
+
+#output {
+    background-color: darkslategray;
+    color: white;
+    font-size: 16px;
+    padding: 10px;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
+#string_box {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#string_input {
+    font-size: 20px;
+    background-color: darkslategray;
+    color: white;
+    padding: 6px;
+    margin: 10px;
+}
+.input_box {
+    margin: 10px;
+}

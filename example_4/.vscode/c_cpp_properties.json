@@ -1,0 +1,34 @@
+{
+  "configurations": [
+    {
+      "name": "Win32",
+      "includePath": [
+        "D:/tools/emsdk/upstream/emscripten/system/include",
+        "D:/tools/emsdk/upstream/emscripten/cache/wasm",
+        "D:/tools/emsdk/upstream/emscripten/cache/wasm/include",
+        "D:/tools/emsdk/upstream/emscripten/cache/wasm/ports-builds/sdl2/src",
+        "${workspaceFolder}",
+        "D:/tools/emsdk/upstream/include"
+      ],
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "intelliSenseMode": "msvc-x64",
+      "browse": {
+        "path": [
+          "D:/tools/emsdk/upstream/emscripten/system/include",
+          "D:/tools/emsdk/upstream/emscripten/cache/wasm",
+          "D:/tools/emsdk/upstream/emscripten/cache/wasm/include",
+          "D:/tools/emsdk/upstream/emscripten/cache/wasm/ports-builds/sdl2/src",
+          "D:/tools/emsdk/upstream/include",
+          "${workspaceFolder}"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      }
+    }
+  ],
+  "version": 4
+}
