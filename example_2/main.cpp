@@ -3,8 +3,6 @@
 #include <string>
 using namespace std;
 
-extern void SomeJsFunction(const char* error_message);
-
 EM_JS(void, NoReturnValueWithNoParameters, (), {
   console.log("NoReturnValueWithNoParameters called");
 });
