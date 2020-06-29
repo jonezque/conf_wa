@@ -1,0 +1,78 @@
+{
+  "configurations": [
+    {
+      "name": "Mac",
+      "includePath": [
+        "${workspaceFolder}"
+      ],
+      "defines": [],
+      "intelliSenseMode": "clang-x64",
+      "browse": {
+        "path": [
+          "${workspaceFolder}"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      },
+      "macFrameworkPath": [
+        "/System/Library/Frameworks",
+        "/Library/Frameworks"
+      ],
+      "compilerPath": "/usr/bin/clang",
+      "cStandard": "c11",
+      "cppStandard": "c++17"
+    },
+    {
+      "name": "Linux",
+      "includePath": [
+        "/usr/include",
+        "/usr/local/include",
+        "${workspaceFolder}",
+        "${env:EMSCRIPTEN}/system/include"
+      ],
+      "defines": [],
+      "intelliSenseMode": "clang-x64",
+      "browse": {
+        "path": [
+          "/usr/include",
+          "/usr/local/include",
+          "${workspaceFolder}"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      }
+    },
+    {
+      "name": "Win32",
+      "includePath": [
+        "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
+        "D:/tools/emsdk/upstream/emscripten/system/include",
+        "D:/tools/emsdk/upstream/emscripten/cache/wasm",
+        "D:/tools/emsdk/upstream/emscripten/cache/wasm/include",
+        "D:/tools/emsdk/upstream/emscripten/cache/wasm/ports-builds/sdl2/src",
+        "${workspaceFolder}",
+        "D:/tools/emsdk/upstream/include"
+      ],
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "_UNICODE"
+      ],
+      "intelliSenseMode": "msvc-x64",
+      "browse": {
+        "path": [
+          "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
+          "D:/tools/emsdk/upstream/emscripten/system/include",
+          "D:/tools/emsdk/upstream/emscripten/cache/wasm",
+          "D:/tools/emsdk/upstream/emscripten/cache/wasm/include",
+          "D:/tools/emsdk/upstream/emscripten/cache/wasm/ports-builds/sdl2/src",
+          "D:/tools/emsdk/upstream/include",
+          "${workspaceFolder}"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": ""
+      }
+    }
+  ],
+  "version": 4
+}
