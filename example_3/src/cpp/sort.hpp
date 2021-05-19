@@ -1,10 +1,10 @@
-#include <iostream>
+#ifndef SORT_H
+#define SORT_H
 #include <string>
 #include <algorithm>
 #include <chrono>
 
-extern "C"
-{
+namespace benchmark {
     int sortArray(double *d, int size)
     {
         auto start = std::chrono::steady_clock::now();
@@ -15,7 +15,7 @@ extern "C"
         return ms;
     }
 
-    int sortIntArray(int *d, int size)
+    int sortArray(int *d, int size)
     {
         auto start = std::chrono::steady_clock::now();
         std::sort(d, d + size);
@@ -24,8 +24,6 @@ extern "C"
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_seconds).count();
         return ms;
     }
-
-    int main () {
-        std::cout << "Hello React" << std::endl;
-    }
 }
+
+#endif

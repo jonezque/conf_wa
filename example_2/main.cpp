@@ -7,16 +7,17 @@ EM_JS(void, NoReturnValueWithNoParameters, (), {
   console.log("NoReturnValueWithNoParameters called");
 });
 
-EM_JS(double, WithParams, (int a, double b), {
-  console.log("WithParams", a, b);
-  return a + b;
-});
+EM_JS(double, WithParams, (int a, double b),
+      {
+        console.log("WithParams", a, b);
+        return a + b;
+      });
 
 int main()
 {
   NoReturnValueWithNoParameters();
   auto c = WithParams(1, 2);
-  cout << "WithParams result = " << c << endl;
+  std::cout << "WithParams result = " << c << endl;
 
   EM_ASM(console.log('console from main.cpp'));
 
@@ -28,16 +29,18 @@ int main()
 
   double sum = EM_ASM_DOUBLE({
     return $0 + $1;
-  }, 10.5, 20.1);
+  },
+                             10.5, 20.1);
   cout << "sum = " << sum << endl;
 
-  char* message = (char*)EM_ASM_INT({
-    const msg = "string from JS";
-    const byteCount = (Module.lengthBytesUTF8(msg) + 1);
-    const greetingsPointer = Module._malloc(byteCount);
-    Module.stringToUTF8(msg, greetingsPointer, byteCount);
-    return greetingsPointer;
-  });
+  char *message = (char *)EM_ASM_INT(
+      {
+        const msg = "string from JS";
+        const byteCount = (Module.lengthBytesUTF8(msg) + 1);
+        const greetingsPointer = Module._malloc(byteCount);
+        Module.stringToUTF8(msg, greetingsPointer, byteCount);
+        return greetingsPointer;
+      });
   cout << "message = " << message << endl;
   free(message);
 }

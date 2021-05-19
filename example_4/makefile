@@ -6,7 +6,7 @@
 CPP_FILES = $(wildcard *.c)
 
 # Name of output (the .wasm file is created automatically):
-OUTPUT_FILE = webgl.html
+OUTPUT_FILE = index.html
 
 # This is the target that compiles our executable
 compile: $(CPP_FILES)

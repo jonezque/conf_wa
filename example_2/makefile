@@ -10,7 +10,7 @@ OUTPUT_FILE = index.html
 
 # This is the target that compiles our executable
 compile: $(CPP_FILES)
-	emcc main.cpp -s EXTRA_EXPORTED_RUNTIME_METHODS="['UTF8ToString', 'lengthBytesUTF8', 'stringToUTF8']" -o $(OUTPUT_FILE)
+	emcc main.cpp -s EXPORTED_RUNTIME_METHODS="['UTF8ToString', 'lengthBytesUTF8', 'stringToUTF8']" -o $(OUTPUT_FILE)
 
 # Removes the existing index.js and index.wasm files:
 clean:

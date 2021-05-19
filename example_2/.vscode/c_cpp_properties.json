@@ -4,10 +4,6 @@
       "name": "Win32",
       "includePath": [
         "D:/tools/emsdk/upstream/emscripten/system/include",
-        "D:/tools/emsdk/upstream/emscripten/cache/wasm",
-        "D:/tools/emsdk/upstream/emscripten/cache/wasm/include",
-        "D:/sber/WA/example_2/zlib-1.2.3-lib/include",
-        "D:/tools/emsdk/upstream/emscripten/cache/wasm/ports-builds/sdl2/src",
         "${workspaceFolder}",
         "D:/tools/emsdk/upstream/include"
       ],
@@ -16,16 +12,10 @@
         "UNICODE",
         "_UNICODE"
       ],
-      "cppStandard": "c++20",
-      "cStandard": "c11",
       "intelliSenseMode": "msvc-x64",
       "browse": {
         "path": [
           "D:/tools/emsdk/upstream/emscripten/system/include",
-          "D:/tools/emsdk/upstream/emscripten/cache/wasm",
-          "D:/tools/emsdk/upstream/emscripten/cache/wasm/include",
-          "D:/sber/WA/example_2/zlib-1.2.3-lib/include",
-          "D:/tools/emsdk/upstream/emscripten/cache/wasm/ports-builds/sdl2/src",
           "D:/tools/emsdk/upstream/include",
           "${workspaceFolder}"
         ],

@@ -58,8 +58,8 @@
         }
         if (array_test != null) {
           const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-          const bytesPerElement = Module.HEAP32.BYTES_PER_ELEMENT;
-          const arrayPointer = Module._malloc((arr.length * bytesPerElement));
+          const bytesPerElement = Int32Array.BYTES_PER_ELEMENT;
+          const arrayPointer = Module._malloc(arr.length * bytesPerElement);
           Module.HEAP32.set(arr, (arrayPointer / bytesPerElement));
           array_test(arrayPointer, arr.length);
           Module._free(arrayPointer);
@@ -138,7 +138,7 @@
       };
     };
   </script>
-  <script async type="text/javascript" src="shell-test.js"></script>
+  <script async type="text/javascript" src="index.js"></script>
 </body>
 
 </html>

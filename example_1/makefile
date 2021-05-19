@@ -9,10 +9,10 @@ CPP_FILES = $(wildcard *.cpp)
 FLAGS = -std=c++20 \
 		--shell-file new_shell.html \
 		-s EXPORTED_FUNCTIONS="['_test', '_string_test', '_int_test', '_float_test', '_array_test', '_main']" \
-		-s EXTRA_EXPORTED_RUNTIME_METHODS="['cwrap', 'ccall']"
+		-s EXPORTED_RUNTIME_METHODS="['cwrap', 'ccall']"
 
 # Name of output (the .wasm file is created automatically):
-OUTPUT_FILE = shell-test.html
+OUTPUT_FILE = index.html
 
 # This is the target that compiles our executable
 compile: $(CPP_FILES)

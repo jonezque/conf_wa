@@ -728,9 +728,6 @@ function cwrap(ident, returnType, argTypes, opts) {
 
 // We used to include malloc/free by default in the past. Show a helpful error in
 // builds with assertions.
-function _malloc() {
-  abort("malloc() called but not included in the build - add '_malloc' to EXPORTED_FUNCTIONS");
-}
 function _free() {
   // Show a helpful error since we used to include free by default in the past.
   abort("free() called but not included in the build - add '_free' to EXPORTED_FUNCTIONS");
@@ -755,7 +752,7 @@ function allocate(slab, allocator) {
   if (allocator == ALLOC_STACK) {
     ret = stackAlloc(slab.length);
   } else {
-    ret = abort('malloc was not included, but is needed in allocate. Adding "_malloc" to EXPORTED_FUNCTIONS should fix that. This may be a bug in the compiler, please file an issue.');;
+    ret = _malloc(slab.length);
   }
 
   if (slab.subarray || slab.slice) {
@@ -1100,7 +1097,7 @@ function lengthBytesUTF32(str) {
 // It is the responsibility of the caller to free() that memory.
 function allocateUTF8(str) {
   var size = lengthBytesUTF8(str) + 1;
-  var ret = abort('malloc was not included, but is needed in allocateUTF8. Adding "_malloc" to EXPORTED_FUNCTIONS should fix that. This may be a bug in the compiler, please file an issue.');;
+  var ret = _malloc(size);
   if (ret) stringToUTF8Array(str, HEAP8, ret, size);
   return ret;
 }
@@ -1667,14 +1664,9 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  15167: function() {console.log('console from main.cpp')},  
- 15204: function($0, $1) {console.log('a = ', $0, ' b = ', $1)},  
- 15241: function($0) {console.log('hello ' + Module.UTF8ToString($0))},  
- 15289: function($0, $1) {return $0 + $1;},  
- 15309: function() {const msg = "string from JS"; const byteCount = (Module.lengthBytesUTF8(msg) + 1); const greetingsPointer = Module._malloc(byteCount); Module.stringToUTF8(msg, greetingsPointer, byteCount); return greetingsPointer;}
+  15288: function() {InitWrappers()}
 };
-function NoReturnValueWithNoParameters(){ console.log("NoReturnValueWithNoParameters called"); }
-function WithParams(a,b){ console.log("WithParams", a, b); return a + b; }
+
 
 
 
@@ -1743,12 +1735,95 @@ function WithParams(a,b){ console.log("WithParams", a, b); return a + b; }
       return demangleAll(js);
     }
 
+  var ExceptionInfoAttrs={DESTRUCTOR_OFFSET:0,REFCOUNT_OFFSET:4,TYPE_OFFSET:8,CAUGHT_OFFSET:12,RETHROWN_OFFSET:13,SIZE:16};
+  function ___cxa_allocate_exception(size) {
+      // Thrown object is prepended by exception metadata block
+      return _malloc(size + ExceptionInfoAttrs.SIZE) + ExceptionInfoAttrs.SIZE;
+    }
+
   function _atexit(func, arg) {
     }
   function ___cxa_atexit(a0,a1
   ) {
   return _atexit(a0,a1);
   }
+
+  function ExceptionInfo(excPtr) {
+      this.excPtr = excPtr;
+      this.ptr = excPtr - ExceptionInfoAttrs.SIZE;
+  
+      this.set_type = function(type) {
+        HEAP32[(((this.ptr)+(ExceptionInfoAttrs.TYPE_OFFSET))>>2)] = type;
+      };
+  
+      this.get_type = function() {
+        return HEAP32[(((this.ptr)+(ExceptionInfoAttrs.TYPE_OFFSET))>>2)];
+      };
+  
+      this.set_destructor = function(destructor) {
+        HEAP32[(((this.ptr)+(ExceptionInfoAttrs.DESTRUCTOR_OFFSET))>>2)] = destructor;
+      };
+  
+      this.get_destructor = function() {
+        return HEAP32[(((this.ptr)+(ExceptionInfoAttrs.DESTRUCTOR_OFFSET))>>2)];
+      };
+  
+      this.set_refcount = function(refcount) {
+        HEAP32[(((this.ptr)+(ExceptionInfoAttrs.REFCOUNT_OFFSET))>>2)] = refcount;
+      };
+  
+      this.set_caught = function (caught) {
+        caught = caught ? 1 : 0;
+        HEAP8[(((this.ptr)+(ExceptionInfoAttrs.CAUGHT_OFFSET))>>0)] = caught;
+      };
+  
+      this.get_caught = function () {
+        return HEAP8[(((this.ptr)+(ExceptionInfoAttrs.CAUGHT_OFFSET))>>0)] != 0;
+      };
+  
+      this.set_rethrown = function (rethrown) {
+        rethrown = rethrown ? 1 : 0;
+        HEAP8[(((this.ptr)+(ExceptionInfoAttrs.RETHROWN_OFFSET))>>0)] = rethrown;
+      };
+  
+      this.get_rethrown = function () {
+        return HEAP8[(((this.ptr)+(ExceptionInfoAttrs.RETHROWN_OFFSET))>>0)] != 0;
+      };
+  
+      // Initialize native structure fields. Should be called once after allocated.
+      this.init = function(type, destructor) {
+        this.set_type(type);
+        this.set_destructor(destructor);
+        this.set_refcount(0);
+        this.set_caught(false);
+        this.set_rethrown(false);
+      }
+  
+      this.add_ref = function() {
+        var value = HEAP32[(((this.ptr)+(ExceptionInfoAttrs.REFCOUNT_OFFSET))>>2)];
+        HEAP32[(((this.ptr)+(ExceptionInfoAttrs.REFCOUNT_OFFSET))>>2)] = value + 1;
+      };
+  
+      // Returns true if last reference released.
+      this.release_ref = function() {
+        var prev = HEAP32[(((this.ptr)+(ExceptionInfoAttrs.REFCOUNT_OFFSET))>>2)];
+        HEAP32[(((this.ptr)+(ExceptionInfoAttrs.REFCOUNT_OFFSET))>>2)] = prev - 1;
+        assert(prev > 0);
+        return prev === 1;
+      };
+    }
+  
+  var exceptionLast=0;
+  
+  var uncaughtExceptionCount=0;
+  function ___cxa_throw(ptr, type, destructor) {
+      var info = new ExceptionInfo(ptr);
+      // Initialize ExceptionInfo content after it was allocated in __cxa_allocate_exception.
+      info.init(type, destructor);
+      exceptionLast = ptr;
+      uncaughtExceptionCount++;
+      throw ptr + " - Exception catching is disabled, this exception cannot be caught. Compile with -s NO_DISABLE_EXCEPTION_CATCHING or -s EXCEPTION_CATCHING_ALLOWED=[..] to catch.";
+    }
 
   function _abort() {
       abort();
@@ -1781,11 +1856,6 @@ function WithParams(a,b){ console.log("WithParams", a, b); return a + b; }
       if (!ASM_CONSTS.hasOwnProperty(code)) abort('No EM_ASM constant found at address ' + code);
       return ASM_CONSTS[code].apply(null, args);
     }
-  function _emscripten_asm_const_double(a0,a1,a2
-  ) {
-  return _emscripten_asm_const_int(a0,a1,a2);
-  }
-
 
   function _emscripten_memcpy_big(dest, src, num) {
       HEAPU8.copyWithin(dest, src, src + num);
@@ -2118,7 +2188,7 @@ function WithParams(a,b){ console.log("WithParams", a, b); return a + b; }
   
   function mmapAlloc(size) {
       var alignedSize = alignMemory(size, 16384);
-      var ptr = abort('malloc was not included, but is needed in mmapAlloc. Adding "_malloc" to EXPORTED_FUNCTIONS should fix that. This may be a bug in the compiler, please file an issue.');;
+      var ptr = _malloc(alignedSize);
       while (size < alignedSize) HEAP8[ptr + size++] = 0;
       return ptr;
     }
@@ -4737,11 +4807,10 @@ function intArrayToString(array) {
 
 
 var asmLibraryArg = {
-  "NoReturnValueWithNoParameters": NoReturnValueWithNoParameters,
-  "WithParams": WithParams,
+  "__cxa_allocate_exception": ___cxa_allocate_exception,
   "__cxa_atexit": ___cxa_atexit,
+  "__cxa_throw": ___cxa_throw,
   "abort": _abort,
-  "emscripten_asm_const_double": _emscripten_asm_const_double,
   "emscripten_asm_const_int": _emscripten_asm_const_int,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
   "emscripten_resize_heap": _emscripten_resize_heap,
@@ -4757,6 +4826,21 @@ var asmLibraryArg = {
 var asm = createWasm();
 /** @type {function(...*):?} */
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__wasm_call_ctors");
+
+/** @type {function(...*):?} */
+var _test = Module["_test"] = createExportWrapper("test");
+
+/** @type {function(...*):?} */
+var _int_test = Module["_int_test"] = createExportWrapper("int_test");
+
+/** @type {function(...*):?} */
+var _float_test = Module["_float_test"] = createExportWrapper("float_test");
+
+/** @type {function(...*):?} */
+var _string_test = Module["_string_test"] = createExportWrapper("string_test");
+
+/** @type {function(...*):?} */
+var _array_test = Module["_array_test"] = createExportWrapper("array_test");
 
 /** @type {function(...*):?} */
 var _main = Module["_main"] = createExportWrapper("main");
@@ -4792,6 +4876,9 @@ var _emscripten_stack_get_end = Module["_emscripten_stack_get_end"] = function()
 };
 
 /** @type {function(...*):?} */
+var _malloc = Module["_malloc"] = createExportWrapper("malloc");
+
+/** @type {function(...*):?} */
 var dynCall_viijii = Module["dynCall_viijii"] = createExportWrapper("dynCall_viijii");
 
 /** @type {function(...*):?} */
@@ -4814,16 +4901,16 @@ var dynCall_iiiiiijj = Module["dynCall_iiiiiijj"] = createExportWrapper("dynCall
 
 if (!Object.getOwnPropertyDescriptor(Module, "intArrayFromString")) Module["intArrayFromString"] = function() { abort("'intArrayFromString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Object.getOwnPropertyDescriptor(Module, "intArrayToString")) Module["intArrayToString"] = function() { abort("'intArrayToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
-if (!Object.getOwnPropertyDescriptor(Module, "ccall")) Module["ccall"] = function() { abort("'ccall' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
-if (!Object.getOwnPropertyDescriptor(Module, "cwrap")) Module["cwrap"] = function() { abort("'cwrap' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
+Module["ccall"] = ccall;
+Module["cwrap"] = cwrap;
 if (!Object.getOwnPropertyDescriptor(Module, "setValue")) Module["setValue"] = function() { abort("'setValue' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Object.getOwnPropertyDescriptor(Module, "getValue")) Module["getValue"] = function() { abort("'getValue' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Object.getOwnPropertyDescriptor(Module, "allocate")) Module["allocate"] = function() { abort("'allocate' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Object.getOwnPropertyDescriptor(Module, "UTF8ArrayToString")) Module["UTF8ArrayToString"] = function() { abort("'UTF8ArrayToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
-Module["UTF8ToString"] = UTF8ToString;
+if (!Object.getOwnPropertyDescriptor(Module, "UTF8ToString")) Module["UTF8ToString"] = function() { abort("'UTF8ToString' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Object.getOwnPropertyDescriptor(Module, "stringToUTF8Array")) Module["stringToUTF8Array"] = function() { abort("'stringToUTF8Array' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
-Module["stringToUTF8"] = stringToUTF8;
-Module["lengthBytesUTF8"] = lengthBytesUTF8;
+if (!Object.getOwnPropertyDescriptor(Module, "stringToUTF8")) Module["stringToUTF8"] = function() { abort("'stringToUTF8' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
+if (!Object.getOwnPropertyDescriptor(Module, "lengthBytesUTF8")) Module["lengthBytesUTF8"] = function() { abort("'lengthBytesUTF8' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Object.getOwnPropertyDescriptor(Module, "stackTrace")) Module["stackTrace"] = function() { abort("'stackTrace' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Object.getOwnPropertyDescriptor(Module, "addOnPreRun")) Module["addOnPreRun"] = function() { abort("'addOnPreRun' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
 if (!Object.getOwnPropertyDescriptor(Module, "addOnInit")) Module["addOnInit"] = function() { abort("'addOnInit' was not exported. add it to EXPORTED_RUNTIME_METHODS (see the FAQ)") };
